@@ -77,7 +77,9 @@ def evaluate_fitness(solution, E, hard_weight=1000):
     Fitness = hard weight * # hard violations + soft weight * # soft violations
 
     Hard violation is when student has conflicting exams
-    Soft violation is when student has consecutive exams
+    Soft violations:
+        1. when student has consecutive exams
+        2. when exam is scheduled in the last time slot
 
     Args:
         solution (list): assignments of exams to slots
@@ -92,6 +94,8 @@ def evaluate_fitness(solution, E, hard_weight=1000):
 
     M = len(E)
     N = len(solution)
+    K = max(solution) + 1  # number of time slots
+    last_slot = K - 1
 
     for student in range(M):
         # collect slots of exams that student is enrolled in
@@ -109,9 +113,13 @@ def evaluate_fitness(solution, E, hard_weight=1000):
         # Soft constraint 1: consecutive exams
         for i in range(len(slots) - 1):
             if slots[i + 1] == slots[i] + 1:
+                soft_violations += 2
+
+        # Soft constraint 2: exams in the last time slot
+        for slot in slots:
+            if slot == last_slot:
                 soft_violations += 1
 
-    # Lexicographic fitness: (hard_violations, soft_violations)
     fitness = (hard_violations, soft_violations)
     return fitness, hard_violations, soft_violations
 
@@ -154,7 +162,6 @@ def select_parents(population, fitnesses, elite_size=1, tournament_size=3):
 
     pop_size = len(population)
 
-    # Elitism
     # sort population by ascending fitness
     sorted_indeces = sorted(range(pop_size), key=lambda i: fitnesses[i])
     new_population = [population[i] for i in sorted_indeces[:elite_size]]
@@ -165,3 +172,75 @@ def select_parents(population, fitnesses, elite_size=1, tournament_size=3):
         new_population.append(parent)
 
     return new_population
+
+
+def crossover(parent1, parent2, method="single_point"):
+    """
+    Create child from two parent solutions via crossover
+
+    Args:
+        parent1 (list): first parent solution (exam -> slot assignments)
+        parent2 (list): second parent solution
+        method (str): crossover method - "single_point" or "uniform"
+
+    Returns:
+        tuple: (child1, child2)
+    """
+    N = len(parent1)
+
+    if method == "single_point":
+        # Single-point crossover: split at random point and swap segments
+        crossover_point = random.randint(1, N - 1)
+        child1 = parent1[:crossover_point] + parent2[crossover_point:]
+        child2 = parent2[:crossover_point] + parent1[crossover_point:]
+
+    elif method == "uniform":
+        # Uniform crossover: randomly inherit each gene from either parent
+        child1 = []
+        child2 = []
+        for i in range(N):
+            if random.random() < 0.5:
+                child1.append(parent1[i])
+                child2.append(parent2[i])
+            else:
+                child1.append(parent2[i])
+                child2.append(parent1[i])
+
+    else:
+        raise ValueError(f"Unknown crossover method: {method}")
+
+    return child1, child2
+
+
+def mutate(solution, K, mutation_rate):
+    """
+    Mutate a solution by randomly changing exam slot assignments
+
+    Args:
+        solution (list): exam -> slot assignments
+        K (int): number of time slots
+        mutation_rate (float): probability of mutating each exam
+
+    Returns:
+        mutated solution (list)
+    """
+    mutated = solution[:]
+    for i in range(len(mutated)):
+        if random.random() < mutation_rate:
+            mutated[i] = random.randint(0, K - 1)
+    return mutated
+
+
+def population_diversity(population):
+    # Compute average normalized Hamming distance between all pairs
+    pop_size = len(population)
+    if pop_size < 2:
+        return 0.0
+    total_dist = 0
+    count = 0
+    for i in range(pop_size):
+        for j in range(i + 1, pop_size):
+            dist = sum(a != b for a, b in zip(population[i], population[j]))
+            total_dist += dist / len(population[i])
+            count += 1
+    return total_dist / count if count > 0 else 0.0
