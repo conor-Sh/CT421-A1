@@ -70,58 +70,47 @@ def initialize_population(pop_size, N, K):
     return population
 
 
-def evaluate_fitness(solution, E, hard_weight=1000):
+def evaluate_fitness(solution, E, K):
     """
-    Evaluates the fitness of a specific timetable solution
+    Fitness is a tuple (hard_violations, soft_violations).
 
-    Fitness = hard weight * # hard violations + soft weight * # soft violations
+    Hard violations:
+        Number of conflicting exam pairs for each student.
 
-    Hard violation is when student has conflicting exams
     Soft violations:
-        1. when student has consecutive exams
-        2. when exam is scheduled in the last time slot
-
-    Args:
-        solution (list): assignments of exams to slots
-        E (list of lists): enrollment matrix
-        hard_weight (int): penalty for hard constraint violations
-
-    Returns:
-        tuple: (fitness, hard_violations, soft_violations)
+        1. Consecutive exams for a student (penalty +2 per consecutive pair)
+        2. Exams scheduled in the last time slot (penalty +1 each)
     """
     hard_violations = 0
     soft_violations = 0
 
     M = len(E)
     N = len(solution)
-    K = max(solution) + 1  # number of time slots
+
     last_slot = K - 1
 
     for student in range(M):
-        # collect slots of exams that student is enrolled in
-        slots = []
-        for exam in range(N):
-            if E[student][exam] == 1:
-                slots.append(solution[exam])
+        # collect slots of exams the student is enrolled in
+        slots = [solution[exam] for exam in range(N) if E[student][exam] == 1]
 
-        # Hard constraint
+        # Hard constraint: count conflicting pairs
         for i in range(len(slots)):
             for j in range(i + 1, len(slots)):
                 if slots[i] == slots[j]:
                     hard_violations += 1
 
-        # Soft constraint 1: consecutive exams
+        # Soft constraint 1: consecutive exams (must sort!)
+        slots.sort()
         for i in range(len(slots) - 1):
             if slots[i + 1] == slots[i] + 1:
                 soft_violations += 2
 
-        # Soft constraint 2: exams in the last time slot
+        # Soft constraint 2: exams in the last slot
         for slot in slots:
             if slot == last_slot:
                 soft_violations += 1
 
-    fitness = (hard_violations, soft_violations)
-    return fitness, hard_violations, soft_violations
+    return (hard_violations, soft_violations)
 
 
 def tournament_selection(population, fitnesses, tournament_size):
