@@ -24,7 +24,7 @@ def main():
     BASE_MUTATION_RATE = 0.1
     MUTATION_RATE_BOOST = 0.3
     STAGNATION_THRESHOLD = 20
-    CROSSOVER_RATE = 0.9
+    CROSSOVER_RATE = 0.7
 
     # -------------------------------
     # INPUT
