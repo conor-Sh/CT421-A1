@@ -99,11 +99,11 @@ def evaluate_fitness(solution, E, K):
                 if slots[i] == slots[j]:
                     hard_violations += 1
 
-        # Soft constraint 1: consecutive exams (must sort!)
+        # Soft constraint 1: consecutive exams
         slots.sort()
         for i in range(len(slots) - 1):
             if slots[i + 1] == slots[i] + 1:
-                soft_violations += 2
+                soft_violations += 1
 
         # Soft constraint 2: exams in the last slot
         for slot in slots:
