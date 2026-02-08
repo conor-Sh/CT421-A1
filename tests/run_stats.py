@@ -30,8 +30,7 @@ def run_ga(instance_file, seed):
     GENERATIONS = 300
     ELITE_SIZE = 1
     TOURNAMENT_SIZE = 8
-    BASE_MUTATION_RATE = 0.1
-    MUTATION_RATE_BOOST = 0.3
+    MUTATION_RATE = 0.1
     STAGNATION_THRESHOLD = 50
     CROSSOVER_RATE = 0.9
 
@@ -47,7 +46,6 @@ def run_ga(instance_file, seed):
     best_fitness = evaluate_fitness(best_solution, E, K)
 
     generations_since_improvement = 0
-    current_mutation_rate = BASE_MUTATION_RATE
 
     # -------------------------------
     # MAIN GA LOOP
@@ -62,11 +60,8 @@ def run_ga(instance_file, seed):
             best_fitness = gen_best_fitness
             best_solution = population[gen_best_idx][:]
             generations_since_improvement = 0
-            current_mutation_rate = BASE_MUTATION_RATE
         else:
             generations_since_improvement += 1
-            if generations_since_improvement >= STAGNATION_THRESHOLD:
-                current_mutation_rate = BASE_MUTATION_RATE + MUTATION_RATE_BOOST
 
         # -------------------------------
         # RANDOM IMMIGRANTS
@@ -99,8 +94,8 @@ def run_ga(instance_file, seed):
             else:
                 child1, child2 = parent1[:], parent2[:]
 
-            child1 = mutate(child1, K, current_mutation_rate)
-            child2 = mutate(child2, K, current_mutation_rate)
+            child1 = mutate(child1, K, MUTATION_RATE)
+            child2 = mutate(child2, K, MUTATION_RATE)
 
             new_population.append(child1)
             if len(new_population) < POP_SIZE:

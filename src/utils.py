@@ -218,18 +218,3 @@ def mutate(solution, K, mutation_rate):
         if random.random() < mutation_rate:
             mutated[i] = random.randint(0, K - 1)
     return mutated
-
-
-def population_diversity(population):
-    # Compute average normalized Hamming distance between all pairs
-    pop_size = len(population)
-    if pop_size < 2:
-        return 0.0
-    total_dist = 0
-    count = 0
-    for i in range(pop_size):
-        for j in range(i + 1, pop_size):
-            dist = sum(a != b for a, b in zip(population[i], population[j]))
-            total_dist += dist / len(population[i])
-            count += 1
-    return total_dist / count if count > 0 else 0.0

@@ -21,8 +21,7 @@ def main():
     GENERATIONS = 300
     ELITE_SIZE = 1
     TOURNAMENT_SIZE = 8
-    BASE_MUTATION_RATE = 0.1
-    MUTATION_RATE_BOOST = 0.3
+    MUTATION_RATE = 0.05
     STAGNATION_THRESHOLD = 20
     CROSSOVER_RATE = 0.7
 
@@ -54,8 +53,9 @@ def main():
     best_fitness = evaluate_fitness(best_solution, E, K)
 
     best_fitness_history = []
+    stagnation_hit_generations = []
     generations_since_improvement = 0
-    current_mutation_rate = BASE_MUTATION_RATE
+    current_mutation_rate = MUTATION_RATE
 
     # -------------------------------
     # MAIN GA LOOP
@@ -74,11 +74,11 @@ def main():
             best_fitness = gen_best_fitness
             best_solution = population[gen_best_idx][:]
             generations_since_improvement = 0
-            current_mutation_rate = BASE_MUTATION_RATE
         else:
             generations_since_improvement += 1
-            if generations_since_improvement >= STAGNATION_THRESHOLD:
-                current_mutation_rate = BASE_MUTATION_RATE + MUTATION_RATE_BOOST
+
+        if generations_since_improvement == STAGNATION_THRESHOLD:
+            stagnation_hit_generations.append(generation + 1)
 
         best_fitness_history.append(best_fitness)
 
@@ -102,7 +102,6 @@ def main():
             f"Gen {generation + 1:3d} | "
             f"Gen Best (H,S): {gen_best_fitness} | "
             f"Overall Best (H,S): {best_fitness} || "
-            f"Mutation Rate: {current_mutation_rate:.3f} | "
             f"Stagnant: {generations_since_improvement}/{STAGNATION_THRESHOLD}"
         )
 
@@ -154,6 +153,18 @@ def main():
 
     plt.subplot(1, 2, 1)
     plt.plot(hard_history, linewidth=2, label="Hard Violations")
+    for hit_gen in stagnation_hit_generations:
+        plt.axvline(
+            x=hit_gen,
+            color="tab:orange",
+            linestyle=":",
+            linewidth=1.5,
+            label=(
+                "Stagnation Threshold"
+                if hit_gen == stagnation_hit_generations[0]
+                else None
+            ),
+        )
     plt.xlabel("Generation")
     plt.ylabel("Hard Violations")
     plt.title("Hard Constraint Violations Over Generations")
@@ -162,6 +173,18 @@ def main():
 
     plt.subplot(1, 2, 2)
     plt.plot(soft_history, linewidth=2, label="Soft Violations")
+    for hit_gen in stagnation_hit_generations:
+        plt.axvline(
+            x=hit_gen,
+            color="tab:orange",
+            linestyle=":",
+            linewidth=1.5,
+            label=(
+                "Stagnation Threshold"
+                if hit_gen == stagnation_hit_generations[0]
+                else None
+            ),
+        )
     plt.xlabel("Generation")
     plt.ylabel("Soft Violations")
     plt.title("Soft Constraint Violations Over Generations")
