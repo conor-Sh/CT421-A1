@@ -7,6 +7,8 @@ run_stats.py is the same implementation with summary statistics, you can specify
 
 param_cv.py uses search grids for selected parameters to tune them. Tuning is done using the medium-1.txt instance
 
+utils.py contains functions needed for these files to run
+
 ## TO RUN:
     -   main.py: python src/main.py <data_file> [seed]
     -   run_stats.py: python tests/run_stats.py <data_file> [#runs]
