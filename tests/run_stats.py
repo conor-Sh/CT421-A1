@@ -30,8 +30,8 @@ def run_ga(instance_file, seed):
     GENERATIONS = 300
     ELITE_SIZE = 1
     TOURNAMENT_SIZE = 8
-    MUTATION_RATE = 0.1
-    STAGNATION_THRESHOLD = 50
+    MUTATION_RATE = 0.05
+    STAGNATION_THRESHOLD = 20
     CROSSOVER_RATE = 0.9
 
     N, K, M, E = read_instance(instance_file)

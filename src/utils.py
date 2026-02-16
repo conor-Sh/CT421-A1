@@ -16,7 +16,6 @@ def read_instance(filepath):
         raise FileNotFoundError(f"File not found: {filepath}")
 
     with open(filepath, "r") as file:
-        # strip trailing newlines but keep empty-line handling safe
         lines = [ln.rstrip() for ln in file if ln.strip() != ""]
 
     if not lines:
@@ -90,7 +89,7 @@ def evaluate_fitness(solution, E, K):
     last_slot = K - 1
 
     for student in range(M):
-        # collect slots of exams the student is enrolled in
+        # slots of exams the student is enrolled in
         slots = [solution[exam] for exam in range(N) if E[student][exam] == 1]
 
         # Hard constraint: count conflicting pairs

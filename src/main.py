@@ -18,12 +18,12 @@ def main():
     # PARAMETERS
     # -------------------------------
     POP_SIZE = 400
-    GENERATIONS = 300
+    GENERATIONS = 200
     ELITE_SIZE = 1
     TOURNAMENT_SIZE = 8
     MUTATION_RATE = 0.05
     STAGNATION_THRESHOLD = 20
-    CROSSOVER_RATE = 0.7
+    CROSSOVER_RATE = 0.9
 
     # -------------------------------
     # INPUT
@@ -34,7 +34,7 @@ def main():
 
     instance_file = sys.argv[1]
 
-    # Set seed for reproducibility if provided
+    # Set seed if given
     if len(sys.argv) == 3:
         seed = int(sys.argv[2])
         random.seed(seed)
@@ -48,7 +48,7 @@ def main():
     # -------------------------------
     population = initialize_population(POP_SIZE, N=N, K=K)
 
-    # Fitness is ALWAYS a tuple: (hard, soft)
+    # Fitness tuple: (hard, soft)
     best_solution = population[0][:]
     best_fitness = evaluate_fitness(best_solution, E, K)
 
@@ -65,11 +65,11 @@ def main():
         # Evaluate fitness for population
         fitnesses = [evaluate_fitness(individual, E, K) for individual in population]
 
-        # Best in this generation (tuple comparison)
+        # Best in this generation
         gen_best_idx = fitnesses.index(min(fitnesses))
         gen_best_fitness = fitnesses[gen_best_idx]
 
-        # Track best overall + stagnation
+        # Track best overall and stagnation
         if gen_best_fitness < best_fitness:
             best_fitness = gen_best_fitness
             best_solution = population[gen_best_idx][:]
@@ -132,7 +132,7 @@ def main():
 
         population = new_population[:POP_SIZE]
 
-    end_time = time.time()
+    end_time = time.time()  # stop clock
     elapsed_time = end_time - start_time
     print(f"\nTotal runtime: {elapsed_time:.2f} seconds")
 
@@ -192,14 +192,10 @@ def main():
     plt.grid(True)
 
     plt.tight_layout()
-    plt.savefig("fitness_history.png")
-    print("\nPlot saved as 'fitness_history.png'")
+    plt.savefig("small_fitness_history.png")
+    print("\nPlot saved as 'small_fitness_history.png'")
     plt.show()
 
 
 if __name__ == "__main__":
     main()
-
-
-# need to balance tournament size with population size, keeping elite at 1
-# could break down soft contraints by type

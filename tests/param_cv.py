@@ -155,6 +155,7 @@ def main():
         f"crossover_rate={crossover_rates}, tournament_size={tournament_sizes}"
     )
 
+    # For each combination of param vals
     for POP_SIZE in POP_SIZEs:
         for MUTATION_RATE in MUTATION_RATEs:
             for crossover_rate in crossover_rates:
